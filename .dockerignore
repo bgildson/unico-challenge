@@ -1,0 +1,5 @@
+.git
+.docker
+.vscode
+**/.DS_Store
+.env

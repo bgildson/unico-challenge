@@ -1,0 +1,21 @@
+{
+	"name": "unico-challenge",
+	"dockerComposeFile": "../docker-compose-dev.yml",
+	"service": "app",
+	"workspaceFolder": "/app",
+	"settings": {
+		"terminal.integrated.shell.linux": "/usr/bin/zsh",
+		"go.toolsManagement.checkForUpdates": "off"
+	},
+	"extensions": [
+		"ms-azuretools.vscode-docker",
+		"bungcip.better-toml",
+		"p1c2u.docker-compose",
+		"mikestead.dotenv",
+		"eamodio.gitlens",
+		"golang.go",
+		"esbenp.prettier-vscode"
+	],
+	"remoteUser": "dev",
+	"initializeCommand": "if ! test -f \".env\"; then cp .env.template .env ; fi ; if grep \"USER_UID=\" .env ; then sed -i 's/USER_UID=.*/USER_UID='$(id -u)'/g' .env ; else echo USER_UID=$(id -u) >> .env ; fi ; if grep \"USER_GID=\" .env ; then sed -i 's/USER_GID=.*/USER_GID='$(id -g)'/g' .env ; else echo USER_GID=$(id -g) >> .env ; fi"
+}

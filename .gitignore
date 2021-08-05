@@ -1,0 +1,9 @@
+.docker
+.idea/
+.vscode/settings.json
+**/.DS_Store
+**/.env*
+!**/.env.template
+cover.*
+unico-challenge
+logs.txt

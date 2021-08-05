@@ -1,0 +1,57 @@
+FROM golang:1.16.6
+
+ARG USERNAME=dev
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd $USERNAME -g $USER_GID && \
+    useradd -u $USER_UID -g $USER_GID -lms /bin/bash $USERNAME
+
+ARG GO_TOOLS_WITH_MODULES="\
+    golang.org/x/tools/gopls \
+    honnef.co/go/tools/... \
+    golang.org/x/tools/cmd/gorename \
+    golang.org/x/tools/cmd/goimports \
+    github.com/uudashr/gopkgs/v2/cmd/gopkgs \
+    github.com/ramya-rao-a/go-outline \
+    github.com/godoctor/godoctor \
+    github.com/rogpeppe/godef \
+    github.com/fatih/gomodifytags \
+    github.com/mgechev/revive \
+    github.com/go-delve/delve/cmd/dlv \
+    github.com/golang-migrate/migrate \
+    # github.com/go-swagger/go-swagger/cmd/swagger \
+    github.com/golang/mock/gomock \
+    github.com/spf13/cobra/cobra"
+
+RUN mkdir -p /tmp/gotools \
+    && cd /tmp/gotools \
+    && export GOPATH=/tmp/gotools \
+    # Go tools w/module support
+    && export GO111MODULE=on \
+    && (echo "${GO_TOOLS_WITH_MODULES}" | xargs -n 1 go get -v )2>&1 \
+    # golang-migrate
+    && go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest \
+    # mockgen
+    && go install github.com/golang/mock/mockgen@latest \
+    # golangci-lint
+    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin 2>&1 \
+    # move Go tools into path and clean up
+    && mv /tmp/gotools/bin/* /go/bin/ \
+    && rm -rf /tmp/gotools
+
+RUN apt-get update && \
+    apt-get install -y zsh && \
+    runuser -l dev -c 'sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+
+USER dev
+
+RUN mkdir -p ~/.vscode-server/extensions
+
+WORKDIR /app
+
+ENV GO111MODULE=auto
+
+COPY go.mod go.sum ./
+
+RUN go mod download -x
