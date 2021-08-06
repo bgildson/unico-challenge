@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: unico-challenge-app:prod
+    container_name: unico-challenge-app
+    restart: always
+    environment:
+      - ENVIRONMENT=production
+      - PORT=80
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/unico_challenge?sslmode=disable
+      - LOGS_PATH=/app/logs.txt
+      - PAGINATION_DEFAULT_LIMIT=10
+      - PAGINATION_MAX_LIMIT=50
+    volumes:
+      # just to share logs and DEINFO_AB_FEIRASLIVRES_2014.csv
+      - .:/app
+    ports:
+      - 8080:80
+    depends_on:
+      - db
+
+  db:
+    image: postgres:12-alpine
+    container_name: unico-challenge-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=unico_challenge
+    volumes:
+      - ./.docker/pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: unico-challenge-pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@email.com
+      - PGADMIN_DEFAULT_PASSWORD=123
+    volumes:
+      - ./.docker/pgadmin:/var/lib/pgadmin
+    ports:
+      - 9000:80
+    user: "root:root"
