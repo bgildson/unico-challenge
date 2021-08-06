@@ -137,40 +137,33 @@ func (s service) Import(path string) (string, error) {
 	readErrChan := make(chan error)
 	go s.readFile(path, flChan, readErrChan)
 
-	// import (worker pool)
-	poolSize := 8
-	wg := sync.WaitGroup{}
-	wg.Add(poolSize)
-	var flCount int64
-	importErrChan := make(chan error)
-	for i := 0; i < poolSize; i++ {
-		go func() {
-			defer wg.Done()
-			for fl := range flChan {
-				atomic.AddInt64(&flCount, 1)
-				if _, err := s.repo.CreateOrUpdate(*fl); err != nil {
-					importErrChan <- fmt.Errorf("could not import %d: %v", fl.ID, err)
-				}
-			}
-		}()
-	}
-
-	// count errors
+	// count read errors
 	var readErrCount int64
 	go func() {
 		for range readErrChan {
 			atomic.AddInt64(&readErrCount, 1)
 		}
 	}()
+
+	// import (worker pool)
+	poolSize := 8
+	wg := sync.WaitGroup{}
+	wg.Add(poolSize)
+	var flCount int64
 	var importErrCount int64
-	go func() {
-		for range importErrChan {
-			atomic.AddInt64(&importErrCount, 1)
-		}
-	}()
+	for i := 0; i < poolSize; i++ {
+		go func() {
+			defer wg.Done()
+			for fl := range flChan {
+				atomic.AddInt64(&flCount, 1)
+				if _, err := s.repo.CreateOrUpdate(*fl); err != nil {
+					atomic.AddInt64(&importErrCount, 1)
+				}
+			}
+		}()
+	}
 
 	wg.Wait()
-	close(importErrChan)
 
 	// sync feira_livre table pk
 	var extraErr string
