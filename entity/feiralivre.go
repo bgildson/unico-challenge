@@ -2,6 +2,7 @@ package entity
 
 import "time"
 
+// FeiraLivre represents a feiralivre
 type FeiraLivre struct {
 	ID                  int       `json:"id"`
 	Longitude           float64   `json:"longitude"`

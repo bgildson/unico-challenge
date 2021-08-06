@@ -14,6 +14,7 @@ import (
 	"github.com/bgildson/unico-challenge/repository/feiralivre"
 )
 
+// Service represents how a feiralivre service should be implemented
 type Service interface {
 	Import(path string) (message string, err error)
 }
@@ -23,6 +24,7 @@ type service struct {
 	repo feiralivre.Repository
 }
 
+// New creates a service for feiralivre
 func New(fs afero.Fs, repo feiralivre.Repository) Service {
 	return &service{
 		fs:   fs,
@@ -128,6 +130,7 @@ func (s service) readFile(path string, flChan chan<- *entity.FeiraLivre, errChan
 	}
 }
 
+// Import implements the csv import operation
 func (s service) Import(path string) (string, error) {
 	// read
 	flChan := make(chan *entity.FeiraLivre)

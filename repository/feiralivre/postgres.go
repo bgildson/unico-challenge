@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	// QueryByID is the query used to get one feiralivre by id
 	QueryByID = `
 SELECT
     id,
@@ -32,12 +33,14 @@ SELECT
     updated_at
 FROM feira_livre
 WHERE id = $1;`
+	// QueryCreate is the query used to create a feiralivre
 	QueryCreate = `
 INSERT INTO feira_livre
     (latitude, longitude, setor_censitario, area_ponderacao, codigo_distrito, distrito, codigo_subprefeitura, subprefeitura, regiao5, regiao8, nome_feira, registro, logradouro, numero, bairro, referencia)
 VALUES
     ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
 RETURNING id, created_at, updated_at;`
+	// QueryCreateOrUpdate is the query used to create or update a feiralivre
 	QueryCreateOrUpdate = `
 INSERT INTO feira_livre
     (id, latitude, longitude, setor_censitario, area_ponderacao, codigo_distrito, distrito, codigo_subprefeitura, subprefeitura, regiao5, regiao8, nome_feira, registro, logradouro, numero, bairro, referencia)
@@ -64,6 +67,7 @@ DO
         referencia = $33,
         updated_at = NOW()
 RETURNING id, created_at, updated_at;`
+	// QueryUpdate is the query used to update a feiralivre
 	QueryUpdate = `
 UPDATE
     feira_livre
@@ -88,14 +92,17 @@ SET
 WHERE
     id = $17
 RETURNING updated_at;`
+	// QueryRemove is the query used to remove a feiralivre
 	QueryRemove = `
 DELETE FROM
     feira_livre
 WHERE
     id = $1;`
+	// QuerySyncPK is the query used to sync the feiralivre pk
 	QuerySyncPK = `SELECT SETVAL((SELECT PG_GET_SERIAL_SEQUENCE('"feira_livre"', 'id')), (SELECT (MAX("id") + 1) FROM "feira_livre"), FALSE);`
 )
 
+// ParseQueryParamsToQuery creates a sql query based on queryparams
 func ParseQueryParamsToQuery(qp QueryParams) string {
 	result := `
 SELECT
@@ -161,6 +168,7 @@ LIMIT $` + fmt.Sprint(next+1) + `;`
 	return result
 }
 
+// ParseQueryParamsToArgs creates a slice containing the values for the queryparams
 func ParseQueryParamsToArgs(qp QueryParams) (args []interface{}) {
 	if qp.Distrito != "" {
 		args = append(args, qp.Distrito)
@@ -188,12 +196,14 @@ type postgresRepository struct {
 	db *sql.DB
 }
 
+// NewPostgresRepository creates a postgres repository for feiralivre
 func NewPostgresRepository(db *sql.DB) Repository {
 	return &postgresRepository{
 		db: db,
 	}
 }
 
+// GetByQueryParams implements how to query to get feiralivre based on query params
 func (r postgresRepository) GetByQueryParams(qp QueryParams) ([]entity.FeiraLivre, error) {
 	q := ParseQueryParamsToQuery(qp)
 	a := ParseQueryParamsToArgs(qp)
@@ -236,6 +246,7 @@ func (r postgresRepository) GetByQueryParams(qp QueryParams) ([]entity.FeiraLivr
 	return result, nil
 }
 
+// GetByID implements how to query to get a feiralivre by id
 func (r postgresRepository) GetByID(id int) (*entity.FeiraLivre, error) {
 	row := r.db.QueryRow(QueryByID, id)
 	var f entity.FeiraLivre
@@ -267,6 +278,7 @@ func (r postgresRepository) GetByID(id int) (*entity.FeiraLivre, error) {
 	return &f, nil
 }
 
+// Create implements how to query to create a feiralivre
 func (r postgresRepository) Create(feiraLive entity.FeiraLivre) (*entity.FeiraLivre, error) {
 	err := r.db.
 		QueryRow(
@@ -300,6 +312,7 @@ func (r postgresRepository) Create(feiraLive entity.FeiraLivre) (*entity.FeiraLi
 	return &feiraLive, nil
 }
 
+// CreateOrUpdate implements how to create or update a feiralivre
 func (r postgresRepository) CreateOrUpdate(feiraLive entity.FeiraLivre) (*entity.FeiraLivre, error) {
 	err := r.db.
 		QueryRow(
@@ -350,6 +363,7 @@ func (r postgresRepository) CreateOrUpdate(feiraLive entity.FeiraLivre) (*entity
 	return &feiraLive, nil
 }
 
+// Update implements how to update a feiralivre
 func (r postgresRepository) Update(id int, feiraLive entity.FeiraLivre) (*entity.FeiraLivre, error) {
 	err := r.db.
 		QueryRow(
@@ -382,11 +396,13 @@ func (r postgresRepository) Update(id int, feiraLive entity.FeiraLivre) (*entity
 	return &feiraLive, nil
 }
 
+// Remove implements how to remove a feiralivre
 func (r postgresRepository) Remove(id int) error {
 	_, err := r.db.Exec(QueryRemove, id)
 	return err
 }
 
+// SyncPK implements how to sync the feiralivre table pk
 func (r postgresRepository) SyncPK() error {
 	_, err := r.db.Exec(QuerySyncPK)
 	return err

@@ -15,11 +15,13 @@ import (
 	"github.com/bgildson/unico-challenge/server/response"
 )
 
+// Controller implements a feiralivre controller
 type Controller struct {
 	feiralivreRepo    feiralivre.Repository
 	queryParamsParser parser.QueryParamsParser
 }
 
+// New creates a new Controller struct
 func New(feiralivreRepo feiralivre.Repository, queryParamsParser parser.QueryParamsParser) *Controller {
 	return &Controller{
 		feiralivreRepo:    feiralivreRepo,
@@ -27,6 +29,7 @@ func New(feiralivreRepo feiralivre.Repository, queryParamsParser parser.QueryPar
 	}
 }
 
+// Register attachs the controller routes to the fiber app
 func (c Controller) Register(app *fiber.App, path string) {
 	app.Get(path, c.GetByQueryParams)
 	app.Get(path+"/:id", c.GetByID)
@@ -35,6 +38,7 @@ func (c Controller) Register(app *fiber.App, path string) {
 	app.Delete(path+"/:id", c.Remove)
 }
 
+// GetByQueryParams implements a controller to search feiralivre by query
 func (c Controller) GetByQueryParams(ctx *fiber.Ctx) error {
 	queryParams := c.queryParamsParser(ctx)
 
@@ -54,6 +58,7 @@ func (c Controller) GetByQueryParams(ctx *fiber.Ctx) error {
 	return ctx.JSON(res)
 }
 
+// GetByID implements a controller to get a feiralivre by id
 func (c Controller) GetByID(ctx *fiber.Ctx) error {
 	idParam := ctx.Params("id")
 	id, err := strconv.Atoi(idParam)
@@ -92,6 +97,7 @@ func (c Controller) GetByID(ctx *fiber.Ctx) error {
 	return ctx.JSON(res)
 }
 
+// Create implements a controller to create a feiralivre
 func (c Controller) Create(ctx *fiber.Ctx) error {
 	var fl entity.FeiraLivre
 	if err := json.Unmarshal(ctx.Body(), &fl); err != nil {
@@ -120,6 +126,7 @@ func (c Controller) Create(ctx *fiber.Ctx) error {
 		JSON(res)
 }
 
+// Update implements a controller to update a feiralivre
 func (c Controller) Update(ctx *fiber.Ctx) error {
 	idParam := ctx.Params("id")
 	id, err := strconv.Atoi(idParam)
@@ -171,6 +178,7 @@ func (c Controller) Update(ctx *fiber.Ctx) error {
 		JSON(res)
 }
 
+// Remove implements a controller to remove a feiralivre
 func (c Controller) Remove(ctx *fiber.Ctx) error {
 	idParam := ctx.Params("id")
 	id, err := strconv.Atoi(idParam)

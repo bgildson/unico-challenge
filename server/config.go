@@ -3,14 +3,21 @@ package server
 import "errors"
 
 var (
-	ErrEnvironmentConfigIsInvalid            = errors.New("the Environment config is invalid")
-	ErrPortConfigIsInvalid                   = errors.New("the Port config is invalid")
-	ErrDatabaseURLConfigIsInvalid            = errors.New("the DatabaseURL config is invalid")
-	ErrLogsPathConfigIsInvalid               = errors.New("the LogsPath config is invalid")
+	// ErrEnvironmentConfigIsInvalid is used to represent an error in the Environment config
+	ErrEnvironmentConfigIsInvalid = errors.New("the Environment config is invalid")
+	// ErrPortConfigIsInvalid is used to represent an error in the Port config
+	ErrPortConfigIsInvalid = errors.New("the Port config is invalid")
+	// ErrDatabaseURLConfigIsInvalid is used to represent an error in the DatabaseURL config
+	ErrDatabaseURLConfigIsInvalid = errors.New("the DatabaseURL config is invalid")
+	// ErrLogsPathConfigIsInvalid is used to represent an error in the LogsPath config
+	ErrLogsPathConfigIsInvalid = errors.New("the LogsPath config is invalid")
+	// ErrPaginationDefaultLimitConfigIsInvalid is used to represent an error in the PaginationDefaultLimit config
 	ErrPaginationDefaultLimitConfigIsInvalid = errors.New("the PaginationDefaultLimit config is invalid")
-	ErrPaginationMaxLimitConfigIsInvalid     = errors.New("the PaginationMaxLimit config is invalid")
+	// ErrPaginationMaxLimitConfigIsInvalid is used to represent an error in the PaginationMaxLimit config
+	ErrPaginationMaxLimitConfigIsInvalid = errors.New("the PaginationMaxLimit config is invalid")
 )
 
+// Config represents the server config
 type Config struct {
 	Environment            string
 	Port                   string
@@ -20,6 +27,7 @@ type Config struct {
 	PaginationMaxLimit     int
 }
 
+// NewConfig creates a Config for the server
 func NewConfig(environment, port, databaseURL, logsPath string, paginationDefaultLimit, paginationMaxLimit int) Config {
 	return Config{
 		Environment:            environment,
@@ -31,6 +39,7 @@ func NewConfig(environment, port, databaseURL, logsPath string, paginationDefaul
 	}
 }
 
+// Validate applies the validation for every field in config
 func (c Config) Validate() error {
 	if c.Environment == "" {
 		return ErrEnvironmentConfigIsInvalid

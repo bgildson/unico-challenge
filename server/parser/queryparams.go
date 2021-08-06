@@ -6,8 +6,10 @@ import (
 	"github.com/bgildson/unico-challenge/repository/feiralivre"
 )
 
+// QueryParamsParser indicates how a parser for QueryParams should be implemented
 type QueryParamsParser func(*fiber.Ctx) feiralivre.QueryParams
 
+// NewQueryParamsParser creates a QueryParams parser
 func NewQueryParamsParser(defaultLimit, maxLimit int) QueryParamsParser {
 	return func(c *fiber.Ctx) feiralivre.QueryParams {
 		var queryParams feiralivre.QueryParams

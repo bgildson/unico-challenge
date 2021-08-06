@@ -2,6 +2,7 @@ package feiralivre
 
 import "github.com/bgildson/unico-challenge/entity"
 
+// Repository represents how a feiralivre repository should be implemented
 type Repository interface {
 	GetByID(int) (*entity.FeiraLivre, error)
 	GetByQueryParams(QueryParams) ([]entity.FeiraLivre, error)
@@ -12,6 +13,7 @@ type Repository interface {
 	SyncPK() error
 }
 
+// QueryParams contains the fields that could be used to query a feiralivre
 type QueryParams struct {
 	Distrito  string `query:"distrito"`
 	Regiao5   string `query:"regiao5"`
@@ -20,6 +22,7 @@ type QueryParams struct {
 	Pagination
 }
 
+// Pagination contains the fields that could be used to paginate the query result
 type Pagination struct {
 	Limit  int `query:"limit"`
 	Offset int `query:"offset"`
