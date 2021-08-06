@@ -7,7 +7,8 @@
       "request": "launch",
       "mode": "auto",
       "envFile": "${workspaceFolder}/.env",
-      "program": "${workspaceFolder}/cmd/rest/main.go"
+      "program": "${workspaceFolder}/main.go",
+      "args": ["serve"]
     }
   ]
 }
