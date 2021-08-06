@@ -10,6 +10,7 @@ var rootCmd = &cobra.Command{
 	Long:  `The challenge was to create a CRUD rest api for feiras livres and an command to import the csv containing the feiras livres.`,
 }
 
+// Execute is the entrypoint to the commandline app
 func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }
