@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
@@ -17,10 +16,13 @@ import (
 var importCmd = &cobra.Command{
 	Use:   "import",
 	Short: "Imports a CSV to the database",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		databaseURL := os.Getenv("DATABASE_URL")
 		if databaseURL == "" {
 			logrus.Error("could not load the database connection string")
+		}
+		if databaseURLFlag := cmd.Flag("dsn"); databaseURLFlag.Value.String() != "" {
+			databaseURL = databaseURLFlag.Value.String()
 		}
 
 		db, err := sql.Open("postgres", databaseURL)
@@ -37,16 +39,12 @@ var importCmd = &cobra.Command{
 
 		path := cmd.Flag("file")
 
-		start := time.Now()
-
 		msg, err := s.Import(path.Value.String())
 		if err != nil {
 			logrus.Errorf("could not import: %v", err)
 		}
 
 		fmt.Println(msg)
-
-		fmt.Println(time.Since(start))
 	},
 }
 
